@@ -1,6 +1,7 @@
 # GamePadDemo
 
- Basketball Slam scenario's Harmony OS demo app.
+ Game controller scenario's Harmony OS demo app. </br>
+ User can use Harmony OS smartphone to control the game on Harmony OS tablet
  
 ## Structure
 There are 2 modules:
