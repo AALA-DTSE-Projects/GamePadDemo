@@ -17,7 +17,8 @@
     "package": "com.huawei.gamepaddemo",
     "name": ".MyApplication",
     "deviceType": [
-      "tablet"
+      "tablet",
+      "tv"
     ],
     "distro": {
       "deliveryWithInstall": true,

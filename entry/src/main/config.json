@@ -18,7 +18,8 @@
     "deviceType": [
       "phone",
       "wearable",
-      "tablet"
+      "tablet",
+      "tv"
     ],
     "distro": {
       "deliveryWithInstall": true,
@@ -37,7 +38,7 @@
             ]
           }
         ],
-        "orientation": "unspecified",
+        "orientation": "landscape",
         "name": "com.huawei.gamepaddemo.MainAbility",
         "icon": "$media:icon",
         "description": "$string:mainability_description",

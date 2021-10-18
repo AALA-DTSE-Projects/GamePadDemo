@@ -12,6 +12,9 @@ import ohos.rpc.*;
 public class GameRemote extends RemoteObject implements IRemoteBroker {
     private final String TAG = GameRemote.class.getName();
     static final int REMOTE_COMMAND = 0;
+    static final int SHOOT_COMMAND = 1;
+    static final int MOVE_COMMAND = 2;
+    static final int PAUSE_COMMAND = 3;
     private final Ability ability;
     private boolean isConnected;
     private IGameInterface remoteService;
@@ -47,28 +50,38 @@ public class GameRemote extends RemoteObject implements IRemoteBroker {
 
     @Override
     public boolean onRemoteRequest(int code, MessageParcel data, MessageParcel reply, MessageOption option) throws RemoteException {
-        if (code == REMOTE_COMMAND) {
-            String deviceId = data.readString();
-            String action = data.readString();
-            switch (action) {
-                case Const.START:
-                    if (!isConnected) {
-                        startAndroidApp();
-                        connectToAndroidService();
-                        this.firstDeviceId = deviceId;
-                    } else {
+        switch (code) {
+            case REMOTE_COMMAND:
+                String deviceId = data.readString();
+                String action = data.readString();
+                switch (action) {
+                    case Const.START:
+                        if (!isConnected) {
+                            startAndroidApp();
+                            connectToAndroidService();
+                            this.firstDeviceId = deviceId;
+                        } else {
+                            sendAction(deviceId, action);
+                        }
+                        break;
+                    case Const.FINISH:
                         sendAction(deviceId, action);
-                    }
-                    break;
-                case Const.FINISH:
-                    sendAction(deviceId, action);
-                    ability.disconnectAbility(connection);
-                    break;
-                default:
-                    sendAction(deviceId, action);
-                    break;
-            }
-            return true;
+                        ability.disconnectAbility(connection);
+                        break;
+                    default:
+                        sendAction(deviceId, action);
+                        break;
+                }
+                return true;
+            case SHOOT_COMMAND:
+                shoot(data.readString(), data.readFloat());
+                break;
+            case MOVE_COMMAND:
+                move(data.readString(), data.readInt());
+                break;
+            case PAUSE_COMMAND:
+                pause(data.readString());
+                break;
         }
         return false;
     }
@@ -101,4 +114,21 @@ public class GameRemote extends RemoteObject implements IRemoteBroker {
         }
     }
 
+    private void shoot(String deviceId, float force) {
+        if (remoteService != null) {
+            remoteService.shoot(deviceId, force);
+        }
+    }
+
+    private void move(String deviceId, int angle) {
+        if (remoteService != null) {
+            remoteService.move(deviceId, angle);
+        }
+    }
+
+    private void pause(String deviceId) {
+        if (remoteService != null) {
+            remoteService.pause(deviceId);
+        }
+    }
 }

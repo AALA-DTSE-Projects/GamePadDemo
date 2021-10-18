@@ -1,15 +1,16 @@
 package com.huawei.gamepaddemo.slice;
 
 import com.huawei.gamepaddemo.ResourceTable;
-import com.huawei.gamepaddemo.controller.Const;
-import com.huawei.gamepaddemo.controller.HandleRemoteProxy;
-import com.huawei.gamepaddemo.controller.LogUtil;
+import com.huawei.gamepaddemo.controller.*;
 import com.huawei.gamepaddemo.model.LocationEvent;
 import com.huawei.gamepaddemo.model.TerminateEvent;
 import ohos.aafwk.ability.AbilitySlice;
 import ohos.aafwk.ability.IAbilityConnection;
 import ohos.aafwk.content.Intent;
 import ohos.aafwk.content.Operation;
+import ohos.agp.components.Button;
+import ohos.agp.components.Component;
+import ohos.agp.components.Image;
 import ohos.agp.components.Text;
 import ohos.agp.window.dialog.ToastDialog;
 import ohos.bundle.AbilityInfo;
@@ -23,6 +24,7 @@ import ohos.distributedschedule.interwork.IDeviceStateCallback;
 import ohos.eventhandler.EventHandler;
 import ohos.eventhandler.EventRunner;
 import ohos.eventhandler.InnerEvent;
+import ohos.multimodalinput.event.TouchEvent;
 import ohos.rpc.IRemoteObject;
 import ohos.rpc.RemoteException;
 import org.greenrobot.eventbus.EventBus;
@@ -124,6 +126,7 @@ public class HandleAbilitySlice extends AbilitySlice {
         }
         DeviceManager.registerDeviceStateCallback(callback);
         EventBus.getDefault().register(this);
+        ScreenUtils.setWindows();
     }
 
     private void connectToRemoteService() {
@@ -142,7 +145,7 @@ public class HandleAbilitySlice extends AbilitySlice {
                     0);
             if (abilityInfoList != null && !abilityInfoList.isEmpty()) {
                 connectAbility(intent, connection);
-                LogUtil.info(TAG, "connect service on tablet with id " + deviceId );
+                LogUtil.info(TAG, "connect service on tablet with id " + deviceId);
             } else {
                 showToast("Cannot connect service on tablet");
             }
@@ -152,14 +155,45 @@ public class HandleAbilitySlice extends AbilitySlice {
     }
 
     private void setupRemoteButton() {
-        findComponentById(ResourceTable.Id_up_button).setClickedListener(component ->
-                remoteProxy.remoteControl(Const.UP));
-        findComponentById(ResourceTable.Id_down_button).setClickedListener(component ->
-                remoteProxy.remoteControl(Const.DOWN));
-        findComponentById(ResourceTable.Id_left_button).setClickedListener(component ->
-                remoteProxy.remoteControl(Const.LEFT));
-        findComponentById(ResourceTable.Id_right_button).setClickedListener(component ->
-                remoteProxy.remoteControl(Const.RIGHT));
+        Image directionCircle = (Image) findComponentById(ResourceTable.Id_direction_circle);
+        Image directionButton = (Image) findComponentById(ResourceTable.Id_direction_button);
+        AngleCalculator angleCalculator = new AngleCalculator(
+                directionCircle,
+                directionButton,
+                findComponentById(ResourceTable.Id_layout),
+                ScreenUtils.getScreenHeight(this),
+                angle -> {
+                    remoteProxy.move(angle);
+                }
+        );
+        directionButton.setTouchEventListener(angleCalculator.getOnTouchEvent());
+        findComponentById(ResourceTable.Id_pause_button).setClickedListener(component -> {
+            remoteProxy.pause();
+        });
+        Image shootButton = (Image) findComponentById(ResourceTable.Id_shoot_button);
+        shootButton.setTouchEventListener((component, touchEvent) -> {
+                boolean isHold = false;
+                float force = 0;
+                switch (touchEvent.getAction()) {
+                    case TouchEvent.PRIMARY_POINT_DOWN:
+                    case TouchEvent.OTHER_POINT_DOWN:
+                        isHold = true;
+                        force = touchEvent.getForce(touchEvent.getIndex());
+                        shootButton.setPixelMap(ResourceTable.Media_b);
+                        break;
+                    case TouchEvent.PRIMARY_POINT_UP:
+                    case TouchEvent.OTHER_POINT_UP:
+                        isHold = false;
+                        force = touchEvent.getForce(touchEvent.getIndex());
+                        shootButton.setPixelMap(ResourceTable.Media_a);
+                        break;
+                }
+                LogUtil.info(TAG, "Touch event with isHold is " + isHold + " and force is " + force);
+                if (!isHold && force > 0) {
+                    remoteProxy.shoot(force);
+                }
+                return true;
+        });
     }
 
     private void getTabletDevice() {

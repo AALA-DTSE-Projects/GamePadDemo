@@ -15,16 +15,6 @@ public class MainAbilitySlice extends AbilitySlice {
         requestPermissions(SystemPermission.DISTRIBUTED_DATASYNC);
     }
 
-    @Override
-    public void onActive() {
-        super.onActive();
-    }
-
-    @Override
-    public void onForeground(Intent intent) {
-        super.onForeground(intent);
-    }
-
     private void requestPermissions(String... permissions) {
         for (String permission : permissions) {
             if (verifyCallingOrSelfPermission(permission) != IBundleManager.PERMISSION_GRANTED) {
@@ -36,5 +26,4 @@ public class MainAbilitySlice extends AbilitySlice {
             }
         }
     }
-
 }

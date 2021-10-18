@@ -6,6 +6,9 @@ public abstract class GameServiceStub extends RemoteObject implements IGameInter
 
     static final String DESCRIPTOR = "jp.huawei.a2hdemo.IGameInterface";
     static final int REMOTE_COMMAND = IRemoteObject.MIN_TRANSACTION_ID;
+    static final int SHOOT_COMMAND = IRemoteObject.MIN_TRANSACTION_ID + 1;
+    static final int MOVE_COMMAND = IRemoteObject.MIN_TRANSACTION_ID + 2;
+    static final int PAUSE_COMMAND = IRemoteObject.MIN_TRANSACTION_ID + 3;
 
     public GameServiceStub(String descriptor) {
         super(descriptor);
@@ -34,13 +37,21 @@ public abstract class GameServiceStub extends RemoteObject implements IGameInter
         if (!DESCRIPTOR.equals(token)) {
             return false;
         }
-        if (code == REMOTE_COMMAND) {
-            String deviceId = data.readString();
-            String action = data.readString();
-            action(deviceId, action);
-            return true;
-        } else {
-            return super.onRemoteRequest(code, data, reply, option);
+        switch (code) {
+            case REMOTE_COMMAND:
+                action(data.readString(), data.readString());
+                return true;
+            case SHOOT_COMMAND:
+                shoot(data.readString(), data.readFloat());
+                return true;
+            case MOVE_COMMAND:
+                move(data.readString(), data.readInt());
+                return true;
+            case PAUSE_COMMAND:
+                pause(data.readString());
+                return true;
+            default:
+                return super.onRemoteRequest(code, data, reply, option);
         }
     }
 }

@@ -1,47 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <DependentLayout
     xmlns:ohos="http://schemas.huawei.com/res/ohos"
+    ohos:id="$+id:layout"
     ohos:height="match_parent"
     ohos:width="match_parent"
-    ohos:orientation="vertical">
+    ohos:background_element="$media:bg"
+    ohos:orientation="horizontal">
 
     <Image
-        ohos:id="$+id:up_button"
-        ohos:width="match_content"
-        ohos:height="match_content"
-        ohos:image_src="$media:up_arrow"
-        ohos:center_in_parent="true"
-        ohos:align_parent_top="true"/>
-
+        ohos:id="$+id:direction_button"
+        ohos:width="160vp"
+        ohos:height="160vp"
+        ohos:left_margin="28vp"
+        ohos:bottom_margin="28vp"
+        ohos:background_element="$media:bigcircle"
+        ohos:align_parent_bottom="true"
+        ohos:align_parent_left="true"
+        />
     <Image
-        ohos:id="$+id:down_button"
-        ohos:width="match_content"
-        ohos:height="match_content"
-        ohos:image_src="$media:down_arrow"
-        ohos:center_in_parent="true"
-        ohos:align_parent_bottom="true"/>
-
-    <Image
-        ohos:id="$+id:left_button"
-        ohos:width="match_content"
-        ohos:height="match_content"
-        ohos:image_src="$media:left_arrow"
-        ohos:center_in_parent="true"
-        ohos:align_parent_left="true"/>
-
-    <Image
-        ohos:id="$+id:right_button"
-        ohos:width="match_content"
-        ohos:height="match_content"
-        ohos:image_src="$media:right_arrow"
-        ohos:center_in_parent="true"
-        ohos:align_parent_right="true"/>
+        ohos:id="$+id:direction_circle"
+        ohos:width="80vp"
+        ohos:height="80vp"
+        ohos:background_element="$media:smallcircle"
+        ohos:left_margin="68vp"
+        ohos:bottom_margin="68vp"
+        ohos:align_parent_bottom="true"
+        ohos:align_parent_left="true"
+        />
 
     <Text
         ohos:id="$+id:location_text"
         ohos:height="match_content"
         ohos:width="match_content"
-        ohos:text_size="40fp"
-        ohos:center_in_parent="true" />
+        ohos:text_color="#C1CDC1"
+        ohos:center_in_parent="true"
+        ohos:text_size="20fp"/>
+
+    <Image
+        ohos:id="$+id:pause_button"
+        ohos:bottom_margin="40vp"
+        ohos:right_margin="40vp"
+        ohos:height="100vp"
+        ohos:width="100vp"
+        ohos:padding="10vp"
+        ohos:left_of="$id:shoot_button"
+        ohos:align_parent_bottom="true"
+        ohos:center_in_parent="true"
+        ohos:background_element="$media:pause" />
+
+    <Image
+        ohos:id="$+id:shoot_button"
+        ohos:bottom_margin="40vp"
+        ohos:right_margin="40vp"
+        ohos:height="100vp"
+        ohos:width="100vp"
+        ohos:padding="10vp"
+        ohos:align_parent_right="true"
+        ohos:align_parent_bottom="true"
+        ohos:center_in_parent="true"
+        ohos:background_element="$media:a" />
 
 </DependentLayout>
