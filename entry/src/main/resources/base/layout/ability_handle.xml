@@ -38,26 +38,24 @@
 
     <Image
         ohos:id="$+id:pause_button"
+        ohos:right_margin="20vp"
         ohos:bottom_margin="40vp"
-        ohos:right_margin="40vp"
-        ohos:height="100vp"
-        ohos:width="100vp"
-        ohos:padding="10vp"
+        ohos:height="match_content"
+        ohos:width="match_content"
         ohos:left_of="$id:shoot_button"
         ohos:align_parent_bottom="true"
         ohos:center_in_parent="true"
-        ohos:background_element="$media:pause" />
+        ohos:image_src="$media:pause" />
 
     <Image
         ohos:id="$+id:shoot_button"
         ohos:bottom_margin="40vp"
         ohos:right_margin="40vp"
-        ohos:height="100vp"
-        ohos:width="100vp"
-        ohos:padding="10vp"
+        ohos:height="match_content"
+        ohos:width="match_content"
         ohos:align_parent_right="true"
         ohos:align_parent_bottom="true"
         ohos:center_in_parent="true"
-        ohos:background_element="$media:a" />
+        ohos:image_src="$media:a" />
 
 </DependentLayout>
