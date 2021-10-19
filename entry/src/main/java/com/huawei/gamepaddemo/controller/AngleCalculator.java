@@ -18,11 +18,6 @@ package com.huawei.gamepaddemo.controller;
 import ohos.agp.components.Component;
 import ohos.multimodalinput.event.TouchEvent;
 
-/**
- * 摇杆滑动事件
- *
- * @since 2021-03-15
- */
 public class AngleCalculator {
     private static final String TAG = "AngleUtil";
 
@@ -86,8 +81,11 @@ public class AngleCalculator {
                     float smallCurrX = moveX - smallR;
                     float smallCurrY = moveY - smallR;
                     smallCircle.setVisibility(Component.VISIBLE);
-                    smallCircle.setContentPosition(getSmallCurrentPos(smallCurrX, smallCurrY)[0],
-                            getSmallCurrentPos(smallCurrX, smallCurrY)[1]);
+                    float[] smallCurrentPosition = getSmallCurrentPos(smallCurrX, smallCurrY);
+                    smallCircle.setContentPosition(
+                            smallCurrentPosition[0],
+                            smallCurrentPosition[1]
+                    );
                     calculateAngle();
                     LogUtil.debug(TAG, "point move with angle " + angle);
                     if (listener != null) {
