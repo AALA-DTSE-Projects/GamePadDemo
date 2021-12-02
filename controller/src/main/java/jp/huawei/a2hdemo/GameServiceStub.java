@@ -5,10 +5,11 @@ import ohos.rpc.*;
 public abstract class GameServiceStub extends RemoteObject implements IGameInterface {
 
     static final String DESCRIPTOR = "jp.huawei.a2hdemo.IGameInterface";
-    static final int REMOTE_COMMAND = IRemoteObject.MIN_TRANSACTION_ID;
-    static final int SHOOT_COMMAND = IRemoteObject.MIN_TRANSACTION_ID + 1;
-    static final int MOVE_COMMAND = IRemoteObject.MIN_TRANSACTION_ID + 2;
-    static final int PAUSE_COMMAND = IRemoteObject.MIN_TRANSACTION_ID + 3;
+    static final int START_COMMAND = IRemoteObject.MIN_TRANSACTION_ID;
+    static final int MOVE_COMMAND = IRemoteObject.MIN_TRANSACTION_ID + 1;
+    static final int PRESS_COMMAND = IRemoteObject.MIN_TRANSACTION_ID + 2;
+    static final int RELEASE_COMMAND = IRemoteObject.MIN_TRANSACTION_ID + 3;
+    static final int FINISH_COMMAND = IRemoteObject.MIN_TRANSACTION_ID + 4;
 
     public GameServiceStub(String descriptor) {
         super(descriptor);
@@ -38,17 +39,20 @@ public abstract class GameServiceStub extends RemoteObject implements IGameInter
             return false;
         }
         switch (code) {
-            case REMOTE_COMMAND:
-                action(data.readString(), data.readString());
-                return true;
-            case SHOOT_COMMAND:
-                shoot(data.readString(), data.readFloat());
+            case START_COMMAND:
+                start(data.readString());
                 return true;
             case MOVE_COMMAND:
                 move(data.readString(), data.readInt());
                 return true;
-            case PAUSE_COMMAND:
-                pause(data.readString());
+            case PRESS_COMMAND:
+                buttonPress(data.readString(), data.readString());
+                return true;
+            case RELEASE_COMMAND:
+                buttonRelease(data.readString(), data.readString());
+                return true;
+            case FINISH_COMMAND:
+                finish(data.readString());
                 return true;
             default:
                 return super.onRemoteRequest(code, data, reply, option);

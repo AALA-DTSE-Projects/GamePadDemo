@@ -16,39 +16,18 @@ public class GameServiceProxy implements IGameInterface {
     }
 
     @Override
-    public void action(String deviceId, String action) {
+    public void start(String deviceId) {
         MessageParcel data = MessageParcel.obtain();
         MessageParcel reply = MessageParcel.obtain();
         MessageOption option = new MessageOption(MessageOption.TF_SYNC);
 
         data.writeInterfaceToken(GameServiceStub.DESCRIPTOR);
         data.writeString(deviceId);
-        data.writeString(action);
 
         try {
-            remoteObject.sendRequest(GameServiceStub.REMOTE_COMMAND, data, reply, option);
+            remoteObject.sendRequest(GameServiceStub.START_COMMAND, data, reply, option);
         } catch (RemoteException e) {
-            LogUtil.error(TAG, "remote action error " + e.getMessage());
-        } finally {
-            data.reclaim();
-            reply.reclaim();
-        }
-    }
-
-    @Override
-    public void shoot(String deviceId, float force) {
-        MessageParcel data = MessageParcel.obtain();
-        MessageParcel reply = MessageParcel.obtain();
-        MessageOption option = new MessageOption(MessageOption.TF_SYNC);
-
-        data.writeInterfaceToken(GameServiceStub.DESCRIPTOR);
-        data.writeString(deviceId);
-        data.writeFloat(force);
-
-        try {
-            remoteObject.sendRequest(GameServiceStub.SHOOT_COMMAND, data, reply, option);
-        } catch (RemoteException e) {
-            LogUtil.error(TAG, "shoot action with force error " + e.getMessage());
+            LogUtil.error(TAG, "Start action error " + e.getMessage());
         } finally {
             data.reclaim();
             reply.reclaim();
@@ -76,7 +55,47 @@ public class GameServiceProxy implements IGameInterface {
     }
 
     @Override
-    public void pause(String deviceId) {
+    public void buttonPress(String deviceId, String buttonId) {
+        MessageParcel data = MessageParcel.obtain();
+        MessageParcel reply = MessageParcel.obtain();
+        MessageOption option = new MessageOption(MessageOption.TF_SYNC);
+
+        data.writeInterfaceToken(GameServiceStub.DESCRIPTOR);
+        data.writeString(deviceId);
+        data.writeString(buttonId);
+
+        try {
+            remoteObject.sendRequest(GameServiceStub.PRESS_COMMAND, data, reply, option);
+        } catch (RemoteException e) {
+            LogUtil.error(TAG, "press button action error " + e.getMessage());
+        } finally {
+            data.reclaim();
+            reply.reclaim();
+        }
+    }
+
+    @Override
+    public void buttonRelease(String deviceId, String buttonId) {
+        MessageParcel data = MessageParcel.obtain();
+        MessageParcel reply = MessageParcel.obtain();
+        MessageOption option = new MessageOption(MessageOption.TF_SYNC);
+
+        data.writeInterfaceToken(GameServiceStub.DESCRIPTOR);
+        data.writeString(deviceId);
+        data.writeString(buttonId);
+
+        try {
+            remoteObject.sendRequest(GameServiceStub.RELEASE_COMMAND, data, reply, option);
+        } catch (RemoteException e) {
+            LogUtil.error(TAG, "release button action error " + e.getMessage());
+        } finally {
+            data.reclaim();
+            reply.reclaim();
+        }
+    }
+
+    @Override
+    public void finish(String deviceId) {
         MessageParcel data = MessageParcel.obtain();
         MessageParcel reply = MessageParcel.obtain();
         MessageOption option = new MessageOption(MessageOption.TF_SYNC);
@@ -85,9 +104,9 @@ public class GameServiceProxy implements IGameInterface {
         data.writeString(deviceId);
 
         try {
-            remoteObject.sendRequest(GameServiceStub.PAUSE_COMMAND, data, reply, option);
+            remoteObject.sendRequest(GameServiceStub.FINISH_COMMAND, data, reply, option);
         } catch (RemoteException e) {
-            LogUtil.error(TAG, "pause action error " + e.getMessage());
+            LogUtil.error(TAG, "finish action error " + e.getMessage());
         } finally {
             data.reclaim();
             reply.reclaim();

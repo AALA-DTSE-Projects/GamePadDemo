@@ -11,10 +11,11 @@ import ohos.rpc.*;
 
 public class GameRemote extends RemoteObject implements IRemoteBroker {
     private final String TAG = GameRemote.class.getName();
-    static final int REMOTE_COMMAND = 0;
-    static final int SHOOT_COMMAND = 1;
-    static final int MOVE_COMMAND = 2;
-    static final int PAUSE_COMMAND = 3;
+    static final int START_COMMAND = 0;
+    static final int MOVE_COMMAND = 1;
+    static final int PRESS_COMMAND = 2;
+    static final int RELEASE_COMMAND = 3;
+    static final int FINISH_COMMAND = 4;
     private final Ability ability;
     private boolean isConnected;
     private IGameInterface remoteService;
@@ -26,7 +27,7 @@ public class GameRemote extends RemoteObject implements IRemoteBroker {
             remoteService = GameServiceStub.asInterface(remote);
             LogUtil.info(TAG, "Android service connect done!");
             if (firstDeviceId != null) {
-                remoteService.action(firstDeviceId, Const.START);
+                remoteService.start(firstDeviceId);
             }
         }
 
@@ -49,39 +50,30 @@ public class GameRemote extends RemoteObject implements IRemoteBroker {
     }
 
     @Override
-    public boolean onRemoteRequest(int code, MessageParcel data, MessageParcel reply, MessageOption option) throws RemoteException {
+    public boolean onRemoteRequest(int code, MessageParcel data, MessageParcel reply, MessageOption option) {
         switch (code) {
-            case REMOTE_COMMAND:
+            case START_COMMAND:
                 String deviceId = data.readString();
-                String action = data.readString();
-                switch (action) {
-                    case Const.START:
-                        if (!isConnected) {
-                            startAndroidApp();
-                            connectToAndroidService();
-                            this.firstDeviceId = deviceId;
-                        } else {
-                            sendAction(deviceId, action);
-                        }
-                        break;
-                    case Const.FINISH:
-                        sendAction(deviceId, action);
-                        ability.disconnectAbility(connection);
-                        break;
-                    default:
-                        sendAction(deviceId, action);
-                        break;
+                if (!isConnected) {
+                    startAndroidApp();
+                    connectToAndroidService();
+                    this.firstDeviceId = deviceId;
+                } else {
+                    start(deviceId);
                 }
                 return true;
-            case SHOOT_COMMAND:
-                shoot(data.readString(), data.readFloat());
-                break;
             case MOVE_COMMAND:
                 move(data.readString(), data.readInt());
-                break;
-            case PAUSE_COMMAND:
-                pause(data.readString());
-                break;
+                return true;
+            case PRESS_COMMAND:
+                press(data.readString(), data.readString());
+                return true;
+            case RELEASE_COMMAND:
+                release(data.readString(), data.readString());
+                return true;
+            case FINISH_COMMAND:
+                finish(data.readString());
+                return true;
         }
         return false;
     }
@@ -108,15 +100,9 @@ public class GameRemote extends RemoteObject implements IRemoteBroker {
         isConnected = ability.connectAbility(intent, connection);
     }
 
-    private void sendAction(String deviceId, String action) {
+    private void start(String deviceId) {
         if (remoteService != null) {
-            remoteService.action(deviceId, action);
-        }
-    }
-
-    private void shoot(String deviceId, float force) {
-        if (remoteService != null) {
-            remoteService.shoot(deviceId, force);
+            remoteService.start(deviceId);
         }
     }
 
@@ -126,9 +112,21 @@ public class GameRemote extends RemoteObject implements IRemoteBroker {
         }
     }
 
-    private void pause(String deviceId) {
+    private void press(String deviceId, String buttonId) {
         if (remoteService != null) {
-            remoteService.pause(deviceId);
+            remoteService.buttonPress(deviceId, buttonId);
+        }
+    }
+
+    private void release(String deviceId, String buttonId) {
+        if (remoteService != null) {
+            remoteService.buttonRelease(deviceId, buttonId);
+        }
+    }
+
+    private void finish(String deviceId) {
+        if (remoteService != null) {
+            remoteService.finish(deviceId);
         }
     }
 }

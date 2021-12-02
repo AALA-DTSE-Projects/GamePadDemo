@@ -38,14 +38,33 @@
 
     <Image
         ohos:id="$+id:pause_button"
-        ohos:right_margin="20vp"
+        ohos:top_margin="40vp"
+        ohos:right_margin="30vp"
+        ohos:height="match_content"
+        ohos:width="match_content"
+        ohos:align_parent_right="true"
+        ohos:align_parent_top="true"
+        ohos:image_src="$media:pause" />
+
+    <Image
+        ohos:id="$+id:steal_button"
         ohos:bottom_margin="40vp"
+        ohos:right_margin="20vp"
         ohos:height="match_content"
         ohos:width="match_content"
         ohos:left_of="$id:shoot_button"
         ohos:align_parent_bottom="true"
-        ohos:center_in_parent="true"
-        ohos:image_src="$media:pause" />
+        ohos:image_src="$media:a" />
+
+    <Image
+        ohos:id="$+id:pass_button"
+        ohos:bottom_margin="120vp"
+        ohos:right_margin="40vp"
+        ohos:height="match_content"
+        ohos:width="match_content"
+        ohos:align_parent_right="true"
+        ohos:align_parent_bottom="true"
+        ohos:image_src="$media:a" />
 
     <Image
         ohos:id="$+id:shoot_button"

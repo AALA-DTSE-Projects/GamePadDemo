@@ -1,5 +1,6 @@
 package com.huawei.gamepaddemo.controller;
 
+import com.huawei.gamepaddemo.ControllerServiceAbility;
 import ohos.aafwk.ability.Ability;
 import ohos.aafwk.ability.IAbilityConnection;
 import ohos.aafwk.content.Intent;
@@ -14,10 +15,6 @@ public class ResultRemote extends ResultStub {
     private final HashMap<String, IAbilityConnection> connectionMap;
     private final HashMap<String, ControllerRemoteProxy> controllerRemoteProxyMap;
 
-    interface ConnectionDoneCallback {
-        void onConnectionDone(ControllerRemoteProxy controllerRemoteProxy);
-    }
-
     public ResultRemote(Ability ability) {
         super("Result remote");
         this.ability = ability;
@@ -31,30 +28,7 @@ public class ResultRemote extends ResultStub {
     }
 
     @Override
-    public void sendLocation(String deviceId, float x, float y) {
-        if (!controllerRemoteProxyMap.containsKey(deviceId)) {
-            connectToAbility(deviceId, controllerRemoteProxy -> controllerRemoteProxy.sendLocation(x, y));
-        } else {
-            ControllerRemoteProxy controllerRemoteProxy = controllerRemoteProxyMap.get(deviceId);
-            if (controllerRemoteProxy != null) {
-                controllerRemoteProxy.sendLocation(x, y);
-            }
-        }
-    }
-
-    @Override
-    public void disconnect(String deviceId) {
-        ControllerRemoteProxy controllerRemoteProxy = controllerRemoteProxyMap.get(deviceId);
-        if (controllerRemoteProxy != null) {
-            controllerRemoteProxy.terminate();
-        }
-        IAbilityConnection connection = connectionMap.getOrDefault(deviceId, null);
-        if (connection != null) {
-            ability.disconnectAbility(connection);
-        }
-    }
-
-    private void connectToAbility(String deviceId, ConnectionDoneCallback callback) {
+    public void connect(String deviceId) {
         Intent intent = new Intent();
         Operation operation = new Intent.OperationBuilder()
                 .withDeviceId(deviceId)
@@ -69,7 +43,6 @@ public class ResultRemote extends ResultStub {
                 connectionMap.put(deviceId, this);
                 ControllerRemoteProxy controllerRemoteProxy = new ControllerRemoteProxy(remoteObject);
                 controllerRemoteProxyMap.put(deviceId, controllerRemoteProxy);
-                callback.onConnectionDone(controllerRemoteProxy);
             }
 
             @Override
@@ -81,4 +54,22 @@ public class ResultRemote extends ResultStub {
         ability.connectAbility(intent, connection);
     }
 
+    @Override
+    public void disconnect(String deviceId) {
+        ControllerRemoteProxy controllerRemoteProxy = controllerRemoteProxyMap.get(deviceId);
+        if (controllerRemoteProxy != null) {
+            controllerRemoteProxy.terminate();
+        }
+        IAbilityConnection connection = connectionMap.getOrDefault(deviceId, null);
+        if (connection != null) {
+            ability.disconnectAbility(connection);
+        }
+        Intent intent = new Intent();
+        Operation operation = new Intent.OperationBuilder()
+                .withBundleName(ability.getBundleName())
+                .withAbilityName(ControllerServiceAbility.class.getName())
+                .build();
+        intent.setOperation(operation);
+        ability.stopAbility(intent);
+    }
 }

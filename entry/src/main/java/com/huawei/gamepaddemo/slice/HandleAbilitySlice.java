@@ -2,16 +2,12 @@ package com.huawei.gamepaddemo.slice;
 
 import com.huawei.gamepaddemo.ResourceTable;
 import com.huawei.gamepaddemo.controller.*;
-import com.huawei.gamepaddemo.model.LocationEvent;
 import com.huawei.gamepaddemo.model.TerminateEvent;
 import ohos.aafwk.ability.AbilitySlice;
 import ohos.aafwk.ability.IAbilityConnection;
 import ohos.aafwk.content.Intent;
 import ohos.aafwk.content.Operation;
-import ohos.agp.components.Button;
-import ohos.agp.components.Component;
 import ohos.agp.components.Image;
-import ohos.agp.components.Text;
 import ohos.agp.window.dialog.ToastDialog;
 import ohos.bundle.AbilityInfo;
 import ohos.bundle.ElementName;
@@ -38,6 +34,10 @@ public class HandleAbilitySlice extends AbilitySlice {
     private static final int EVENT_STATE_CHANGE = 10001;
     private HandleRemoteProxy remoteProxy;
     private String deviceId;
+    private final String SHOOT_ID = "Button1";
+    private final String STEAL_ID = "Button2";
+    private final String PASS_ID = "Button3";
+    private final String PAUSE_ID = "Button4";
 
     private final EventHandler handler = new EventHandler(EventRunner.current()) {
         @Override
@@ -72,7 +72,7 @@ public class HandleAbilitySlice extends AbilitySlice {
                     .getId();
             remoteProxy = new HandleRemoteProxy(remote, localDeviceId);
             LogUtil.info(TAG, "ability connect done!");
-            remoteProxy.remoteControl(Const.START);
+            remoteProxy.start();
             setupRemoteButton();
         }
 
@@ -99,18 +99,10 @@ public class HandleAbilitySlice extends AbilitySlice {
     @Override
     protected void onBackPressed() {
         super.onBackPressed();
-        remoteProxy.remoteControl(Const.FINISH);
+        remoteProxy.finish();
         disconnectAbility(connection);
         DeviceManager.unregisterDeviceStateCallback(callback);
         EventBus.getDefault().unregister(this);
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onLocationEvent(LocationEvent event) {
-        getUITaskDispatcher().asyncDispatch(() -> {
-            Text text = (Text) findComponentById(ResourceTable.Id_location_text);
-            text.setText(event.toString());
-        });
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -162,37 +154,72 @@ public class HandleAbilitySlice extends AbilitySlice {
                 directionButton,
                 findComponentById(ResourceTable.Id_layout),
                 ScreenUtils.getScreenHeight(this),
-                angle -> {
-                    remoteProxy.move(angle);
-                }
+                angle -> remoteProxy.move(angle)
         );
         directionButton.setTouchEventListener(angleCalculator.getOnTouchEvent());
-        findComponentById(ResourceTable.Id_pause_button).setClickedListener(component -> {
-            remoteProxy.pause();
-        });
         Image shootButton = (Image) findComponentById(ResourceTable.Id_shoot_button);
         shootButton.setTouchEventListener((component, touchEvent) -> {
-                boolean isHold = false;
-                float force = 0;
                 switch (touchEvent.getAction()) {
                     case TouchEvent.PRIMARY_POINT_DOWN:
                     case TouchEvent.OTHER_POINT_DOWN:
-                        isHold = true;
-                        force = touchEvent.getForce(touchEvent.getIndex());
                         shootButton.setPixelMap(ResourceTable.Media_b);
+                        remoteProxy.press(SHOOT_ID);
                         break;
                     case TouchEvent.PRIMARY_POINT_UP:
                     case TouchEvent.OTHER_POINT_UP:
-                        isHold = false;
-                        force = touchEvent.getForce(touchEvent.getIndex());
                         shootButton.setPixelMap(ResourceTable.Media_a);
+                        remoteProxy.release(SHOOT_ID);
                         break;
                 }
-                LogUtil.info(TAG, "Touch event with isHold is " + isHold + " and force is " + force);
-                if (!isHold && force > 0) {
-                    remoteProxy.shoot(force);
-                }
                 return true;
+        });
+        Image stealButton = (Image) findComponentById(ResourceTable.Id_steal_button);
+        shootButton.setTouchEventListener((component, touchEvent) -> {
+            switch (touchEvent.getAction()) {
+                case TouchEvent.PRIMARY_POINT_DOWN:
+                case TouchEvent.OTHER_POINT_DOWN:
+                    stealButton.setPixelMap(ResourceTable.Media_b);
+                    remoteProxy.press(STEAL_ID);
+                    break;
+                case TouchEvent.PRIMARY_POINT_UP:
+                case TouchEvent.OTHER_POINT_UP:
+                    stealButton.setPixelMap(ResourceTable.Media_a);
+                    remoteProxy.release(STEAL_ID);
+                    break;
+            }
+            return true;
+        });
+        Image passButton = (Image) findComponentById(ResourceTable.Id_pass_button);
+        shootButton.setTouchEventListener((component, touchEvent) -> {
+            switch (touchEvent.getAction()) {
+                case TouchEvent.PRIMARY_POINT_DOWN:
+                case TouchEvent.OTHER_POINT_DOWN:
+                    passButton.setPixelMap(ResourceTable.Media_b);
+                    remoteProxy.press(PASS_ID);
+                    break;
+                case TouchEvent.PRIMARY_POINT_UP:
+                case TouchEvent.OTHER_POINT_UP:
+                    passButton.setPixelMap(ResourceTable.Media_a);
+                    remoteProxy.release(PASS_ID);
+                    break;
+            }
+            return true;
+        });
+        Image pauseButton = (Image) findComponentById(ResourceTable.Id_pause_button);
+        shootButton.setTouchEventListener((component, touchEvent) -> {
+            switch (touchEvent.getAction()) {
+                case TouchEvent.PRIMARY_POINT_DOWN:
+                case TouchEvent.OTHER_POINT_DOWN:
+                    pauseButton.setPixelMap(ResourceTable.Media_b);
+                    remoteProxy.press(PAUSE_ID);
+                    break;
+                case TouchEvent.PRIMARY_POINT_UP:
+                case TouchEvent.OTHER_POINT_UP:
+                    pauseButton.setPixelMap(ResourceTable.Media_a);
+                    remoteProxy.release(PAUSE_ID);
+                    break;
+            }
+            return true;
         });
     }
 
