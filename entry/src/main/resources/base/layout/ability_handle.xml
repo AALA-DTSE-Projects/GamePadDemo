@@ -28,14 +28,6 @@
         ohos:align_parent_left="true"
         />
 
-    <Text
-        ohos:id="$+id:location_text"
-        ohos:height="match_content"
-        ohos:width="match_content"
-        ohos:text_color="#C1CDC1"
-        ohos:center_in_parent="true"
-        ohos:text_size="20fp"/>
-
     <Image
         ohos:id="$+id:pause_button"
         ohos:top_margin="40vp"

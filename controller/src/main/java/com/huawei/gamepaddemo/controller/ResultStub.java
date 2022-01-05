@@ -4,7 +4,7 @@ import ohos.rpc.*;
 
 public abstract class ResultStub extends RemoteObject implements IResultInterface {
     static final String DESCRIPTOR = "com.huawei.gamepaddemo.controller.IResultInterface";
-    static final int LOCATION_COMMAND = RemoteObject.MIN_TRANSACTION_ID;
+    static final int CONNECT_COMMAND = RemoteObject.MIN_TRANSACTION_ID;
     static final int DISCONNECT_COMMAND = RemoteObject.MIN_TRANSACTION_ID + 1;
 
     public ResultStub(String descriptor) {
@@ -24,10 +24,8 @@ public abstract class ResultStub extends RemoteObject implements IResultInterfac
         }
         String deviceId = data.readString();
         switch (code) {
-            case LOCATION_COMMAND:
-                float x = data.readFloat();
-                float y = data.readFloat();
-                sendLocation(deviceId, x, y);
+            case CONNECT_COMMAND:
+                connect(deviceId);
                 return true;
             case DISCONNECT_COMMAND:
                 disconnect(deviceId);
