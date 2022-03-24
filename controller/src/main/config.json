@@ -17,13 +17,15 @@
     "package": "com.huawei.gamepaddemo",
     "name": ".MyApplication",
     "deviceType": [
+      "phone",
       "tablet",
       "tv"
     ],
     "distro": {
       "deliveryWithInstall": true,
       "moduleName": "controller",
-      "moduleType": "entry"
+      "moduleType": "entry",
+      "installationFree": false
     },
     "abilities": [
       {
