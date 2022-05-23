@@ -16,7 +16,10 @@
 package com.huawei.gamepaddemo.controller;
 
 import ohos.agp.components.Component;
+import ohos.multimodalinput.event.MmiPoint;
 import ohos.multimodalinput.event.TouchEvent;
+
+import java.util.List;
 
 public class AngleCalculator {
     private static final String TAG = "AngleUtil";
@@ -43,17 +46,27 @@ public class AngleCalculator {
 
     private int bigR;
 
+    private List<Component> buttons;
+
     private final Listener listener;
 
     public interface Listener {
         void sendAngle(int angle);
     }
 
-    public AngleCalculator(Component smallCircle, Component bigCircle, Component layout, int screenHeight, Listener listener) {
+    public AngleCalculator(
+            Component smallCircle,
+            Component bigCircle,
+            Component layout,
+            int screenHeight,
+            List<Component> buttons,
+            Listener listener
+    ) {
         this.smallCircle = smallCircle;
         this.bigCircle = bigCircle;
         this.layout = layout;
         this.screenHeight = screenHeight;
+        this.buttons = buttons;
         this.listener = listener;
     }
 
@@ -92,6 +105,10 @@ public class AngleCalculator {
                         listener.sendAngle(angle);
                     }
                     break;
+                case TouchEvent.OTHER_POINT_DOWN:
+                    for (int index = 0; index < touchEvent.getPointerCount(); index ++) {
+                        otherPointDown(touchEvent, index);
+                    }
                 default:
                     return false;
             }
@@ -161,7 +178,7 @@ public class AngleCalculator {
 
     private double getDisZ() {
         return Math.sqrt(Math.abs(moveX - startPosX) * Math.abs(moveX - startPosX)
-            + Math.abs(moveY - startPosY) * Math.abs(moveY - startPosY));
+                + Math.abs(moveY - startPosY) * Math.abs(moveY - startPosY));
     }
 
     private float[] getSmallCurrentPos(float currX, float currY) {
@@ -196,5 +213,22 @@ public class AngleCalculator {
             }
         }
         return smallCurrentPos;
+    }
+
+    private boolean isInComponentArea(Component component, float pointX, float pointY) {
+        int top = component.getTop();
+        int bottom = component.getBottom();
+        int left = component.getLeft();
+        int right = component.getRight();
+        return pointX > left && pointX < right && pointY > top && pointY < bottom;
+    }
+
+    private void otherPointDown(TouchEvent event, int index) {
+        this.buttons.forEach((component -> {
+            MmiPoint touchPosition = event.getPointerPosition(index);
+            if (isInComponentArea(component, touchPosition.getX() + 50, touchPosition.getY() + 400)) {
+                component.callOnClick();
+            }
+        }));
     }
 }

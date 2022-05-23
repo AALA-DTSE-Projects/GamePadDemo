@@ -55,7 +55,7 @@ public class GameServiceProxy implements IGameInterface {
     }
 
     @Override
-    public void buttonPress(String deviceId, String buttonId) {
+    public void buttonClick(String deviceId, String buttonId) {
         MessageParcel data = MessageParcel.obtain();
         MessageParcel reply = MessageParcel.obtain();
         MessageOption option = new MessageOption(MessageOption.TF_SYNC);
@@ -65,29 +65,9 @@ public class GameServiceProxy implements IGameInterface {
         data.writeString(buttonId);
 
         try {
-            remoteObject.sendRequest(GameServiceStub.PRESS_COMMAND, data, reply, option);
+            remoteObject.sendRequest(GameServiceStub.CLICK_COMMAND, data, reply, option);
         } catch (RemoteException e) {
-            LogUtil.error(TAG, "press button action error " + e.getMessage());
-        } finally {
-            data.reclaim();
-            reply.reclaim();
-        }
-    }
-
-    @Override
-    public void buttonRelease(String deviceId, String buttonId) {
-        MessageParcel data = MessageParcel.obtain();
-        MessageParcel reply = MessageParcel.obtain();
-        MessageOption option = new MessageOption(MessageOption.TF_SYNC);
-
-        data.writeInterfaceToken(GameServiceStub.DESCRIPTOR);
-        data.writeString(deviceId);
-        data.writeString(buttonId);
-
-        try {
-            remoteObject.sendRequest(GameServiceStub.RELEASE_COMMAND, data, reply, option);
-        } catch (RemoteException e) {
-            LogUtil.error(TAG, "release button action error " + e.getMessage());
+            LogUtil.error(TAG, "click button action error " + e.getMessage());
         } finally {
             data.reclaim();
             reply.reclaim();

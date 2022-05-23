@@ -7,9 +7,8 @@ public abstract class GameServiceStub extends RemoteObject implements IGameInter
     static final String DESCRIPTOR = "jp.huawei.a2hdemo.IGameInterface";
     static final int START_COMMAND = IRemoteObject.MIN_TRANSACTION_ID;
     static final int MOVE_COMMAND = IRemoteObject.MIN_TRANSACTION_ID + 1;
-    static final int PRESS_COMMAND = IRemoteObject.MIN_TRANSACTION_ID + 2;
-    static final int RELEASE_COMMAND = IRemoteObject.MIN_TRANSACTION_ID + 3;
-    static final int FINISH_COMMAND = IRemoteObject.MIN_TRANSACTION_ID + 4;
+    static final int CLICK_COMMAND = IRemoteObject.MIN_TRANSACTION_ID + 2;
+    static final int FINISH_COMMAND = IRemoteObject.MIN_TRANSACTION_ID + 3;
 
     public GameServiceStub(String descriptor) {
         super(descriptor);
@@ -45,11 +44,8 @@ public abstract class GameServiceStub extends RemoteObject implements IGameInter
             case MOVE_COMMAND:
                 move(data.readString(), data.readInt());
                 return true;
-            case PRESS_COMMAND:
-                buttonPress(data.readString(), data.readString());
-                return true;
-            case RELEASE_COMMAND:
-                buttonRelease(data.readString(), data.readString());
+            case CLICK_COMMAND:
+                buttonClick(data.readString(), data.readString());
                 return true;
             case FINISH_COMMAND:
                 finish(data.readString());

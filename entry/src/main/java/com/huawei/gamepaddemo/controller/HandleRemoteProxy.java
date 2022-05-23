@@ -5,9 +5,8 @@ import ohos.rpc.*;
 public class HandleRemoteProxy implements IRemoteBroker {
     private static final int START_COMMAND = 0;
     private static final int MOVE_COMMAND = 1;
-    private static final int PRESS_COMMAND = 2;
-    private static final int RELEASE_COMMAND = 3;
-    private static final int FINISH_COMMAND = 4;
+    private static final int CLICK_COMMAND = 2;
+    private static final int FINISH_COMMAND = 3;
     private final String TAG = HandleRemoteProxy.class.getSimpleName();
     private final IRemoteObject remote;
     private final String deviceId;
@@ -53,32 +52,16 @@ public class HandleRemoteProxy implements IRemoteBroker {
         }
     }
 
-    public void press(String buttonId) {
+    public void click(String buttonId) {
         MessageParcel data = MessageParcel.obtain();
         MessageParcel reply = MessageParcel.obtain();
         MessageOption option = new MessageOption(MessageOption.TF_SYNC);
         data.writeString(deviceId);
         data.writeString(buttonId);
         try {
-            remote.sendRequest(PRESS_COMMAND, data, reply, option);
+            remote.sendRequest(CLICK_COMMAND, data, reply, option);
         } catch (RemoteException e) {
-            LogUtil.error(TAG, "press action error " + e.getMessage());
-        } finally {
-            data.reclaim();
-            reply.reclaim();
-        }
-    }
-
-    public void release(String buttonId) {
-        MessageParcel data = MessageParcel.obtain();
-        MessageParcel reply = MessageParcel.obtain();
-        MessageOption option = new MessageOption(MessageOption.TF_SYNC);
-        data.writeString(deviceId);
-        data.writeString(buttonId);
-        try {
-            remote.sendRequest(RELEASE_COMMAND, data, reply, option);
-        } catch (RemoteException e) {
-            LogUtil.error(TAG, "release action error " + e.getMessage());
+            LogUtil.error(TAG, "click action error " + e.getMessage());
         } finally {
             data.reclaim();
             reply.reclaim();

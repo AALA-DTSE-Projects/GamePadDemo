@@ -7,6 +7,7 @@ import ohos.aafwk.ability.AbilitySlice;
 import ohos.aafwk.ability.IAbilityConnection;
 import ohos.aafwk.content.Intent;
 import ohos.aafwk.content.Operation;
+import ohos.agp.components.Component;
 import ohos.agp.components.Image;
 import ohos.agp.window.dialog.ToastDialog;
 import ohos.bundle.AbilityInfo;
@@ -20,14 +21,17 @@ import ohos.distributedschedule.interwork.IDeviceStateCallback;
 import ohos.eventhandler.EventHandler;
 import ohos.eventhandler.EventRunner;
 import ohos.eventhandler.InnerEvent;
-import ohos.multimodalinput.event.TouchEvent;
 import ohos.rpc.IRemoteObject;
 import ohos.rpc.RemoteException;
+import ohos.vibrator.agent.VibratorAgent;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class HandleAbilitySlice extends AbilitySlice {
     private static final String TAG = HandleAbilitySlice.class.getSimpleName();
@@ -38,6 +42,7 @@ public class HandleAbilitySlice extends AbilitySlice {
     private final String STEAL_ID = "Button2";
     private final String PASS_ID = "Button3";
     private final String PAUSE_ID = "Button4";
+    private VibratorAgent vibratorAgent;
 
     private final EventHandler handler = new EventHandler(EventRunner.current()) {
         @Override
@@ -116,6 +121,7 @@ public class HandleAbilitySlice extends AbilitySlice {
             deviceId = (String) obj;
             connectToRemoteService();
         }
+        vibratorAgent = new VibratorAgent();
         DeviceManager.registerDeviceStateCallback(callback);
         EventBus.getDefault().register(this);
         ScreenUtils.setWindows();
@@ -147,79 +153,66 @@ public class HandleAbilitySlice extends AbilitySlice {
     }
 
     private void setupRemoteButton() {
+        Image pauseButton = (Image) findComponentById(ResourceTable.Id_pause_button);
+        Image shootButton = (Image) findComponentById(ResourceTable.Id_shoot_button);
+        Image stealButton = (Image) findComponentById(ResourceTable.Id_steal_button);
+        Image passButton = (Image) findComponentById(ResourceTable.Id_pass_button);
         Image directionCircle = (Image) findComponentById(ResourceTable.Id_direction_circle);
         Image directionButton = (Image) findComponentById(ResourceTable.Id_direction_button);
+        List<Component> buttons = new ArrayList<>();
+        buttons.add(pauseButton);
+        buttons.add(shootButton);
+        buttons.add(stealButton);
+        buttons.add(passButton);
+        Map<String, Image> buttonMap = new HashMap<>();
+        buttonMap.put(PAUSE_ID, pauseButton);
+        buttonMap.put(SHOOT_ID, shootButton);
+        buttonMap.put(STEAL_ID, stealButton);
+        buttonMap.put(PASS_ID, passButton);
+        Map<String, int[]> buttonResources = new HashMap<>();
+        buttonResources.put(PAUSE_ID, new int[]{ResourceTable.Media_play, ResourceTable.Media_pause});
+        buttonResources.put(SHOOT_ID, new int[]{ResourceTable.Media_shoot_active, ResourceTable.Media_shoot_inactive});
+        buttonResources.put(STEAL_ID, new int[]{ResourceTable.Media_steal_active, ResourceTable.Media_steal_inactive});
+        buttonResources.put(PASS_ID, new int[]{ResourceTable.Media_pass_active, ResourceTable.Media_pass_inactive});
+        Map<String, Boolean> buttonState = new HashMap<>();
+        buttonState.put(PAUSE_ID, false);
+        buttonState.put(SHOOT_ID, false);
+        buttonState.put(STEAL_ID, false);
+        buttonState.put(PASS_ID, false);
+
         AngleCalculator angleCalculator = new AngleCalculator(
                 directionCircle,
                 directionButton,
                 findComponentById(ResourceTable.Id_layout),
                 ScreenUtils.getScreenHeight(this),
+                buttons,
                 angle -> remoteProxy.move(angle)
         );
+
         directionButton.setTouchEventListener(angleCalculator.getOnTouchEvent());
-        Image shootButton = (Image) findComponentById(ResourceTable.Id_shoot_button);
-        shootButton.setTouchEventListener((component, touchEvent) -> {
-                switch (touchEvent.getAction()) {
-                    case TouchEvent.PRIMARY_POINT_DOWN:
-                    case TouchEvent.OTHER_POINT_DOWN:
-                        shootButton.setPixelMap(ResourceTable.Media_b);
-                        remoteProxy.press(SHOOT_ID);
-                        break;
-                    case TouchEvent.PRIMARY_POINT_UP:
-                    case TouchEvent.OTHER_POINT_UP:
-                        shootButton.setPixelMap(ResourceTable.Media_a);
-                        remoteProxy.release(SHOOT_ID);
-                        break;
-                }
-                return true;
+
+        pauseButton.setClickedListener(component -> {
+            remoteProxy.click(PAUSE_ID);
+            vibrator(Const.VIBRATION);
+            updateButtonState(PAUSE_ID, buttonMap, buttonResources, buttonState);
         });
-        Image stealButton = (Image) findComponentById(ResourceTable.Id_steal_button);
-        shootButton.setTouchEventListener((component, touchEvent) -> {
-            switch (touchEvent.getAction()) {
-                case TouchEvent.PRIMARY_POINT_DOWN:
-                case TouchEvent.OTHER_POINT_DOWN:
-                    stealButton.setPixelMap(ResourceTable.Media_b);
-                    remoteProxy.press(STEAL_ID);
-                    break;
-                case TouchEvent.PRIMARY_POINT_UP:
-                case TouchEvent.OTHER_POINT_UP:
-                    stealButton.setPixelMap(ResourceTable.Media_a);
-                    remoteProxy.release(STEAL_ID);
-                    break;
-            }
-            return true;
+
+        shootButton.setClickedListener(component -> {
+            remoteProxy.click(SHOOT_ID);
+            vibrator(Const.VIBRATION);
+            updateButtonState(SHOOT_ID, buttonMap, buttonResources, buttonState);
         });
-        Image passButton = (Image) findComponentById(ResourceTable.Id_pass_button);
-        shootButton.setTouchEventListener((component, touchEvent) -> {
-            switch (touchEvent.getAction()) {
-                case TouchEvent.PRIMARY_POINT_DOWN:
-                case TouchEvent.OTHER_POINT_DOWN:
-                    passButton.setPixelMap(ResourceTable.Media_b);
-                    remoteProxy.press(PASS_ID);
-                    break;
-                case TouchEvent.PRIMARY_POINT_UP:
-                case TouchEvent.OTHER_POINT_UP:
-                    passButton.setPixelMap(ResourceTable.Media_a);
-                    remoteProxy.release(PASS_ID);
-                    break;
-            }
-            return true;
+
+        stealButton.setClickedListener(component -> {
+            remoteProxy.click(STEAL_ID);
+            vibrator(Const.VIBRATION);
+            updateButtonState(STEAL_ID, buttonMap, buttonResources, buttonState);
         });
-        Image pauseButton = (Image) findComponentById(ResourceTable.Id_pause_button);
-        shootButton.setTouchEventListener((component, touchEvent) -> {
-            switch (touchEvent.getAction()) {
-                case TouchEvent.PRIMARY_POINT_DOWN:
-                case TouchEvent.OTHER_POINT_DOWN:
-                    pauseButton.setPixelMap(ResourceTable.Media_b);
-                    remoteProxy.press(PAUSE_ID);
-                    break;
-                case TouchEvent.PRIMARY_POINT_UP:
-                case TouchEvent.OTHER_POINT_UP:
-                    pauseButton.setPixelMap(ResourceTable.Media_a);
-                    remoteProxy.release(PAUSE_ID);
-                    break;
-            }
-            return true;
+
+        passButton.setClickedListener(component -> {
+            remoteProxy.click(PASS_ID);
+            vibrator(Const.VIBRATION);
+            updateButtonState(PASS_ID, buttonMap, buttonResources, buttonState);
         });
     }
 
@@ -246,5 +239,28 @@ public class HandleAbilitySlice extends AbilitySlice {
                 .setText(text)
                 .setAutoClosable(false)
                 .show();
+    }
+
+    private void vibrator(int duration) {
+        List<Integer> vibratorList = vibratorAgent.getVibratorIdList();
+        if (vibratorList.isEmpty()) {
+            return;
+        }
+        int vibratorId = vibratorList.get(0);
+        vibratorAgent.startOnce(vibratorId, duration);
+    }
+
+    private void updateButtonState(
+            String buttonId,
+            Map<String, Image> buttonMap,
+            Map<String, int[]> buttonResources,
+            Map<String, Boolean> buttonState
+    ) {
+        buttonState.keySet().forEach(id -> buttonState.put(id, id.equals(buttonId)));
+        buttonMap.forEach((id, button) -> {
+            boolean isActive = buttonState.get(id);
+            int[] resources = buttonResources.get(id);
+            button.setPixelMap(isActive ? resources[0] : resources[1]);
+        });
     }
 }

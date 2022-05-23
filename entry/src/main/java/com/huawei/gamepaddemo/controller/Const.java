@@ -10,4 +10,5 @@ public class Const {
     public static final int QUADRANT_4 = 4;
     public static final int DEGREE_180 = 180;
     public static final float MIN_SLIDE = 10;
+    public static final int VIBRATION = 50;
 }

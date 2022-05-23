@@ -13,9 +13,8 @@ public class GameRemote extends RemoteObject implements IRemoteBroker {
     private final String TAG = GameRemote.class.getName();
     static final int START_COMMAND = 0;
     static final int MOVE_COMMAND = 1;
-    static final int PRESS_COMMAND = 2;
-    static final int RELEASE_COMMAND = 3;
-    static final int FINISH_COMMAND = 4;
+    static final int CLICK_COMMAND = 2;
+    static final int FINISH_COMMAND = 3;
     private final Ability ability;
     private boolean isConnected;
     private IGameInterface remoteService;
@@ -65,11 +64,8 @@ public class GameRemote extends RemoteObject implements IRemoteBroker {
             case MOVE_COMMAND:
                 move(data.readString(), data.readInt());
                 return true;
-            case PRESS_COMMAND:
-                press(data.readString(), data.readString());
-                return true;
-            case RELEASE_COMMAND:
-                release(data.readString(), data.readString());
+            case CLICK_COMMAND:
+                click(data.readString(), data.readString());
                 return true;
             case FINISH_COMMAND:
                 finish(data.readString());
@@ -112,15 +108,9 @@ public class GameRemote extends RemoteObject implements IRemoteBroker {
         }
     }
 
-    private void press(String deviceId, String buttonId) {
+    private void click(String deviceId, String buttonId) {
         if (remoteService != null) {
-            remoteService.buttonPress(deviceId, buttonId);
-        }
-    }
-
-    private void release(String deviceId, String buttonId) {
-        if (remoteService != null) {
-            remoteService.buttonRelease(deviceId, buttonId);
+            remoteService.buttonClick(deviceId, buttonId);
         }
     }
 
