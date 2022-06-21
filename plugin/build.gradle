@@ -1,17 +1,7 @@
 apply plugin: 'com.huawei.ohos.hap'
 apply plugin: 'com.huawei.ohos.decctest'
+//For instructions on signature configuration, see https://developer.harmonyos.com/en/docs/documentation/doc-guides/ide_debug_device-0000001053822404#EN-US_TOPIC_0000001154985555__section1112183053510
 ohos {
-    signingConfigs {
-        debug {
-            storeFile file('../keystore/debug.p12')
-            storePassword '0000001A7D368D4CC3C0089C94DB3597BC2D2FDECE7019D0A984227E0E03ADEF2CB7C04AB3C2EE566A29'
-            keyAlias = 'gamepad'
-            keyPassword '0000001A23FABB8F1802EC14A957B4CB510D926779DAC53C2D478E64A199A380A7E27C80AD0BC4B49245'
-            signAlg = 'SHA256withECDSA'
-            profile file('../keystore/gamepadDebug.p7b')
-            certpath file('../keystore/gamepad.cer')
-        }
-    }
     compileSdkVersion 4
     defaultConfig {
         compatibleSdkVersion 4
@@ -24,11 +14,10 @@ ohos {
             }
         }
     }
-    entryModules "plugin"
+    
 }
 
 dependencies {
-    entryImplementation project(':plugin')
     implementation fileTree(dir: 'libs', include: ['*.jar', '*.har'])
     testImplementation 'junit:junit:4.13'
     ohosTestImplementation 'com.huawei.ohos.testkit:runner:1.0.0.100'

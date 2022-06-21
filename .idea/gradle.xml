@@ -7,12 +7,13 @@
         <option name="testRunner" value="PLATFORM" />
         <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="D:\Document\DTSE\harmonyOS\devecostudio\DevEco Studio 3.0.0.600\tools\gradle" />
+        <option name="gradleHome" value="C:\Program Files\Huawei\DevEco Studio 2.1.0.501\tools\gradle" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/controller" />
             <option value="$PROJECT_DIR$/entry" />
+            <option value="$PROJECT_DIR$/plugin" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
